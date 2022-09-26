@@ -1,3 +1,5 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -15,8 +17,18 @@ class _CoupangeHomeState extends State<CoupangeHome> {
 
   //텍스트필트 빈 값을 저장할 변수
   String inputText = "";
-  int screenIndex = 0;
-  List<Widget> screenList = [Text('메뉴'), Text('검색'), Text('홈')];
+  TextEditingController textController = TextEditingController();
+
+  //바텀네비게이션 초기화 변수
+  int _selectedIndex = 0;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+      
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +45,7 @@ class _CoupangeHomeState extends State<CoupangeHome> {
             createLogo(),
             onTextField(),
             _mainSlider(),
-            mainIcon(),
+            mainIcon(context),
           ];
         },
         body: ListView.builder(
@@ -85,7 +97,38 @@ class _CoupangeHomeState extends State<CoupangeHome> {
               );
             }),
       ),
+      //바텀네비게이션
+      bottomNavigationBar: BottomNavigationBar(
+        unselectedItemColor: Colors.grey,
+        selectedItemColor: Colors.lightBlue,
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.menu),
+            label: "",
+            // backgroundColor: Colors.grey
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.search),
+              label: ""
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+              label: ""
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.people),
+              label: ""
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.add_shopping_cart_rounded),
+              label: ""
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+      ),
     );
+  }
   }
 
   //로고
@@ -114,6 +157,7 @@ class _CoupangeHomeState extends State<CoupangeHome> {
 
   //텍스트필드
   SliverAppBar onTextField() {
+
     return SliverAppBar(
       backgroundColor: Colors.white,
       pinned: false,
@@ -123,15 +167,11 @@ class _CoupangeHomeState extends State<CoupangeHome> {
         child: TextField(
           textInputAction: TextInputAction.search,
           textAlignVertical: TextAlignVertical.center,
-
           decoration: InputDecoration(
             hintText: "쿠팡에서 검색하세요!",
             prefixIcon: Icon(Icons.search, color: Colors.grey,
                 size: 15.w),
-            // icon: Padding(
-            //   padding: EdgeInsets.only(left: 13),
-            //   child: Icon(Icons.search),
-            // ),
+
             hintStyle: TextStyle(fontSize: 15.w, color: Color(0xffA3A3A3)),
             contentPadding: EdgeInsets.only(
                 left: 10.w, right: 0.w, bottom: 0, top: 0),
@@ -151,13 +191,13 @@ class _CoupangeHomeState extends State<CoupangeHome> {
               borderRadius: BorderRadius.all(Radius.circular(5.0)),
             ),
           ),
-
           maxLines: 1,
           minLines: 1,
         ),
       ),
     );
   }
+
 
   //메인슬라이더
   SliverAppBar _mainSlider() {
@@ -171,7 +211,8 @@ class _CoupangeHomeState extends State<CoupangeHome> {
       // List를 최상단으로 올렸을 때만 나와야 한다. -> false
       floating: true,
       title: CarouselSlider(
-        options: CarouselOptions(height: 120.h),
+        options: CarouselOptions(
+        height: 120.h),
         items: [1, 2, 3, 4, 5].map((i) {
           return Builder(
             builder: (BuildContext context) {
@@ -179,6 +220,7 @@ class _CoupangeHomeState extends State<CoupangeHome> {
                 children: [
                   Container(
                     width: MediaQuery.of(context).size.width,
+                    // height: MediaQuery.of(context).size.height,
                     height: 100.h,
                     // margin: EdgeInsets.symmetric(horizontal: 5.0),
                     decoration: BoxDecoration(
@@ -190,6 +232,7 @@ class _CoupangeHomeState extends State<CoupangeHome> {
                       style: TextStyle(fontSize: 30, color: Colors.black),
                     ),
                   ),
+
                   SizedBox(
                     height: 5,
                   ),
@@ -207,7 +250,7 @@ class _CoupangeHomeState extends State<CoupangeHome> {
   }
 
   //아이콘슬라이더
-  SliverAppBar mainIcon() {
+  SliverAppBar mainIcon(BuildContext context) {
     return SliverAppBar(
       backgroundColor: Colors.grey,
       //SliverAppBar의 높이 설정
@@ -299,23 +342,6 @@ class _CoupangeHomeState extends State<CoupangeHome> {
     );
   }
 
-  //바텀네비게이션
-  bottomNavigationBar() {
-    BottomNavigationBar(
-      currentIndex: screenIndex,
-      items: [
-        BottomNavigationBarItem(icon: Icon(Icons.menu), label: '메뉴'),
-        BottomNavigationBarItem(icon: Icon(Icons.search), label: '검색'),
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: '홈')
-      ],
-      onTap: (value) {
-        setState(() {
-          //상태 갱신이 되지 않으면 동작을 하지 않음
-          screenIndex = value;
-        });
-      },
-    );
-  }
 
 
-}
+
