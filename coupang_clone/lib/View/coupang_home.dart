@@ -1,5 +1,4 @@
 
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -22,12 +21,18 @@ class _CoupangeHomeState extends State<CoupangeHome> {
   //바텀네비게이션 초기화 변수
   int _selectedIndex = 0;
 
+  //바텀네비게이션 _onItemTapped
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
-      
     });
   }
+
+  //메인슬라이더 아이템
+  final items = [
+    Image.asset("assets/images/noodle.jpg"),
+    Image.asset("assets/images/bag.jpg"),
+  ];
 
 
   @override
@@ -45,58 +50,17 @@ class _CoupangeHomeState extends State<CoupangeHome> {
             createLogo(),
             onTextField(),
             _mainSlider(),
-            mainIcon(context),
+            _iconSlider(context),
+            _bannerImage(context),
+            _specialProd(context),
+            // mainIcon(context),
           ];
         },
-        body: ListView.builder(
-            itemCount: 1,
-            itemBuilder: (context, index) {
-              return Row(
-                children: [
-                  Row(
-                    children: [
-                      Column(
-                        children: <Widget>[
-                          Icon(
-                            Icons.local_taxi,
-                            size: 50,
-                          ),
-                          Text("쿠팡택시"),
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          Icon(
-                            Icons.home,
-                            size: 50,
-                          ),
-                          Text("쿠팡홈"),
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          Icon(
-                            Icons.wallet,
-                            size: 50,
-                          ),
-                          Text("쿠팡지갑"),
-                        ],
-                      ),
-                      Column(
-                        children: <Widget>[
-                          Icon(
-                            Icons.radio,
-                            size: 50,
-                          ),
-                          Text("쿠팡라디오"),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              );
-            }),
+        body:
+        _prodBannerText(context),
+
       ),
+
       //바텀네비게이션
       bottomNavigationBar: BottomNavigationBar(
         unselectedItemColor: Colors.grey,
@@ -107,240 +71,685 @@ class _CoupangeHomeState extends State<CoupangeHome> {
             label: "",
             // backgroundColor: Colors.grey
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-              label: ""
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-              label: ""
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.people),
-              label: ""
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add_shopping_cart_rounded),
-              label: ""
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: ""),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: ""),
+          BottomNavigationBarItem(icon: Icon(Icons.people), label: ""),
+          BottomNavigationBarItem(icon: Icon(Icons.add_shopping_cart_rounded), label: ""),
         ],
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
       ),
     );
   }
-  }
+}
 
-  //로고
-  SliverAppBar createLogo() {
-    return SliverAppBar(
-      backgroundColor: Colors.white,
-      expandedHeight: 30.h,
-      floating: false,
-      elevation: 0,
-      flexibleSpace: LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints constraints) {
-        return FlexibleSpaceBar(
-          collapseMode: CollapseMode.parallax,
-          background: Container(
-            color: Colors.white,
-            padding: EdgeInsets.only(top: 30.h),
-            alignment: Alignment.topCenter,
-            child: Image.asset(
-              'assets/images/logo.png',
-            ),
+//로고
+SliverAppBar createLogo() {
+  return SliverAppBar(
+    backgroundColor: Colors.white,
+    expandedHeight: 30.h,
+    floating: false,
+    elevation: 0,
+    flexibleSpace: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+      return FlexibleSpaceBar(
+        collapseMode: CollapseMode.parallax,
+        background: Container(
+          color: Colors.white,
+          padding: EdgeInsets.only(top: 30.h),
+          alignment: Alignment.topCenter,
+          child: Image.asset(
+            'assets/images/logo.png',
           ),
-        );
-      }),
-    );
-  }
-
-  //텍스트필드
-  SliverAppBar onTextField() {
-
-    return SliverAppBar(
-      backgroundColor: Colors.white,
-      pinned: false,
-      title: Container(
-        // alignment: Alignment.topCenter,
-        height: 50.h,
-        child: TextField(
-          textInputAction: TextInputAction.search,
-          textAlignVertical: TextAlignVertical.center,
-          decoration: InputDecoration(
-            hintText: "쿠팡에서 검색하세요!",
-            prefixIcon: Icon(Icons.search, color: Colors.grey,
-                size: 15.w),
-
-            hintStyle: TextStyle(fontSize: 15.w, color: Color(0xffA3A3A3)),
-            contentPadding: EdgeInsets.only(
-                left: 10.w, right: 0.w, bottom: 0, top: 0),
-            //테두리두께
-            border: const OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(2.0)),
-            ),
-
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Color(0xffCBCBCB), width: 2.0),
-              borderRadius: BorderRadius.all(Radius.circular(5.0)),
-            ),
-
-            //텍스트필드 선택시 포커스 라인
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Color(0xffCBCBCB), width: 2.0),
-              borderRadius: BorderRadius.all(Radius.circular(5.0)),
-            ),
-          ),
-          maxLines: 1,
-          minLines: 1,
         ),
+      );
+    }),
+  );
+}
+
+//텍스트필드
+SliverAppBar onTextField() {
+  return SliverAppBar(
+    backgroundColor: Colors.white,
+    pinned: false,
+    title: Container(
+      // alignment: Alignment.topCenter,
+      height: 50.h,
+      child: TextField(
+        textInputAction: TextInputAction.search,
+        textAlignVertical: TextAlignVertical.center,
+        decoration: InputDecoration(
+          hintText: "쿠팡에서 검색하세요!",
+          prefixIcon: Icon(Icons.search, color: Colors.grey, size: 15.w),
+
+          hintStyle: TextStyle(fontSize: 15.w, color: Color(0xffA3A3A3)),
+          contentPadding:
+              EdgeInsets.only(left: 10.w, right: 0.w, bottom: 0, top: 0),
+          //테두리두께
+          border: const OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(2.0)),
+          ),
+
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Color(0xffCBCBCB), width: 2.0),
+            borderRadius: BorderRadius.all(Radius.circular(5.0)),
+          ),
+
+          //텍스트필드 선택시 포커스 라인
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Color(0xffCBCBCB), width: 2.0),
+            borderRadius: BorderRadius.all(Radius.circular(5.0)),
+          ),
+        ),
+        maxLines: 1,
+        minLines: 1,
       ),
-    );
-  }
+    ),
+  );
+}
 
+//메인슬라이더
+SliverAppBar _mainSlider() {
+  return SliverAppBar(
+    // expandedHeight: 100,
+    backgroundColor: Colors.black,
+    //SliverAppBar의 높이 설정
+    toolbarHeight: 170.h,
+    // collapsedHeight: 150,
+    //SliverAppBar 영역을 고정시킨다. default false
+    pinned: false,
+    // AppBar가 하단 List 내렸을 때 바로 보여야 한다 -> true
+    // List를 최상단으로 올렸을 때만 나와야 한다. -> false
+    floating: true,
+    title: Stack(
+      children: [
+        CarouselSlider(
+          options: CarouselOptions(
+            // height: 150.h,
+            autoPlay: true,
+          ),
 
-  //메인슬라이더
-  SliverAppBar _mainSlider() {
-    return SliverAppBar(
-      backgroundColor: Colors.black,
-      //SliverAppBar의 높이 설정
-      toolbarHeight: 150.h,
-      //SliverAppBar 영역을 고정시킨다. default false
-      pinned: false,
-      // AppBar가 하단 List 내렸을 때 바로 보여야 한다 -> true
-      // List를 최상단으로 올렸을 때만 나와야 한다. -> false
-      floating: true,
-      title: CarouselSlider(
-        options: CarouselOptions(
-        height: 120.h),
-        items: [1, 2, 3, 4, 5].map((i) {
-          return Builder(
-            builder: (BuildContext context) {
-              return Column(
-                children: [
-                  Container(
-                    width: MediaQuery.of(context).size.width,
-                    // height: MediaQuery.of(context).size.height,
-                    height: 100.h,
-                    // margin: EdgeInsets.symmetric(horizontal: 5.0),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: Text(
-                      '메인슬라이더 $i',
-                      style: TextStyle(fontSize: 30, color: Colors.black),
-                    ),
-                  ),
-
-                  SizedBox(
-                    height: 5,
-                  ),
-                  CarouselIndicator(
-                    count: i,
-                    index: [i].length,
-                  ),
-                ],
-              );
-            },
-          );
-        }).toList(),
-      ),
-    );
-  }
-
-  //아이콘슬라이더
-  SliverAppBar mainIcon(BuildContext context) {
-    return SliverAppBar(
-      backgroundColor: Colors.grey,
-      //SliverAppBar의 높이 설정
-      toolbarHeight: 200,
-      //SliverAppBar 영역을 고정시킨다. default false
-      pinned: false,
-      // AppBar가 하단 List 내렸을 때 바로 보여야 한다 -> true
-      // List를 최상단으로 올렸을 때만 나와야 한다. -> false
-      floating: true,
-      title: CarouselSlider(
-        options: CarouselOptions(height: MediaQuery.of(context).size.height),
-        items: [1, 2, 3, 4, 5].map((i) {
-          return Builder(
-            builder: (BuildContext context) {
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    height: 200,
-                    width: 700,
-                    padding: EdgeInsets.all(10),
-                    // margin: EdgeInsets.symmetric(horizontal: 5.0),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: Row(
-                      children: [
-                        Row(
-                          children: [
-                            Column(
-                              children: <Widget>[
-                                Icon(
-                                  Icons.local_taxi,
-                                  size: 30,
-                                  color: Colors.black,
-                                ),
-                                Text("쿠팡택시",
-                                  style: TextStyle(color: Colors.black, fontSize: 10),
-                                ),
-                              ],
-                            ),
-                            Column(
-                              children: [
-                                Icon(
-                                  Icons.home,
-                                  size: 30,
-                                  color: Colors.black,
-                                ),
-                                Text("쿠팡홈",
-                                  style: TextStyle(color: Colors.black, fontSize: 10),
-                                ),
-                              ],
-                            ),
-                            Column(
-                              children: [
-                                Icon(
-                                  Icons.wallet,
-                                  size: 30,
-                                  color: Colors.black,
-                                ),
-                                Text("쿠팡지갑",
-                                  style: TextStyle(color: Colors.black, fontSize: 10),
-                                ),
-                              ],
-                            ),
-                            Column(
-                              children: <Widget>[
-                                Icon(
-                                  Icons.radio,
-                                  size: 30,
-                                  color: Colors.black,
-                                ),
-                                Text("쿠팡라디오",
-                                  style: TextStyle(color: Colors.black, fontSize: 10),),
-                              ],
-                            ),
-                          ],
+          items: [1, 2, 3, 4, 5].map((i) {
+            return Builder(
+              builder: (BuildContext context) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: 170.h,
+                      // margin: EdgeInsets.symmetric(horizontal: 5.0),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: SizedBox(
+                        height: 50,
+                        width: 100,
+                        child: Image.asset(
+                          "assets/images/noodle.jpg",
+                          fit: BoxFit.fill,
+                          // '메인슬라이더 $i',
                         ),
-                      ],
+                      ),
                     ),
+                    //메인슬라이더 인디케이터 사이 여백
+                    SizedBox(
+                      height: 5,
+                    ),
+                    //인디케이터
+                    CarouselIndicator(
+                      count: i,
+                      index: [i].length,
+                    ),
+                  ],
+                );
+              },
+            );
+          }).toList(),
+        ),
+      ],
+    ),
+  );
+}
+
+//아이콘슬라이더
+Widget _iconSlider(BuildContext context) {
+  return SliverAppBar(
+    // expandedHeight: 120.h,
+    toolbarHeight: 200.h,
+    title: Container(
+        // padding: EdgeInsets.symmetric(vertical: 50.0),
+        margin: EdgeInsets.only(top: 10, bottom: 10),
+        // 컨테이너의 높이를 200으로 설정
+        height: 200.0,
+        // 리스트뷰 추가
+        child: ListView(
+          // 스크롤 방향 설정. 수평적으로 스크롤되도록 설정
+          scrollDirection: Axis.horizontal,
+          // 컨테이너들을 ListView의 자식들로 추가
+          children: <Widget>[
+            Container(
+              // height: 200.h,
+              width: 500.w,
+              // width: MediaQuery.of(context).size.width,
+              // padding: EdgeInsets.all(10),
+              // margin: EdgeInsets.symmetric(horizontal: 5.0),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: Column(
+                children: [
+                  //1단
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        children: <Widget>[
+                          Icon(
+                            Icons.icecream,
+                            size: 50,
+                            color: Colors.black,
+                          ),
+                          Text(
+                            "쿠팡",
+                            style: TextStyle(
+                                color: Colors.black, fontSize: 10),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        children: <Widget>[
+                          Icon(
+                            Icons.mail,
+                            size: 50,
+                            color: Colors.black,
+                          ),
+                          Text(
+                            "쿠팡메일",
+                            style: TextStyle(
+                                color: Colors.black, fontSize: 10),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        children: <Widget>[
+                          Icon(
+                            Icons.local_taxi,
+                            size: 50,
+                            color: Colors.black,
+                          ),
+                          Text(
+                            "쿠팡택시",
+                            style: TextStyle(
+                                color: Colors.black, fontSize: 10),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          Icon(
+                            Icons.home,
+                            size: 50,
+                            color: Colors.black,
+                          ),
+                          Text(
+                            "쿠팡홈",
+                            style: TextStyle(
+                                color: Colors.black, fontSize: 10),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          Icon(
+                            Icons.wallet,
+                            size: 50,
+                            color: Colors.black,
+                          ),
+                          Text(
+                            "쿠팡지갑",
+                            style: TextStyle(
+                                color: Colors.black, fontSize: 10),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        children: <Widget>[
+                          Icon(
+                            Icons.radio,
+                            size: 50,
+                            color: Colors.black,
+                          ),
+                          Text(
+                            "쿠팡라디오",
+                            style: TextStyle(
+                                color: Colors.black, fontSize: 10),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  //2단
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        children: <Widget>[
+                          Icon(
+                            Icons.icecream,
+                            size: 50,
+                            color: Colors.black,
+                          ),
+                          Text(
+                            "쿠팡",
+                            style: TextStyle(
+                                color: Colors.black, fontSize: 10),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        children: <Widget>[
+                          Icon(
+                            Icons.mail,
+                            size: 50,
+                            color: Colors.black,
+                          ),
+                          Text(
+                            "쿠팡메일",
+                            style: TextStyle(
+                                color: Colors.black, fontSize: 10),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        children: <Widget>[
+                          Icon(
+                            Icons.local_taxi,
+                            size: 50,
+                            color: Colors.black,
+                          ),
+                          Text(
+                            "쿠팡택시",
+                            style: TextStyle(
+                                color: Colors.black, fontSize: 10),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          Icon(
+                            Icons.home,
+                            size: 50,
+                            color: Colors.black,
+                          ),
+                          Text(
+                            "쿠팡홈",
+                            style: TextStyle(
+                                color: Colors.black, fontSize: 10),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          Icon(
+                            Icons.wallet,
+                            size: 50,
+                            color: Colors.black,
+                          ),
+                          Text(
+                            "쿠팡지갑",
+                            style: TextStyle(
+                                color: Colors.black, fontSize: 10),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        children: <Widget>[
+                          Icon(
+                            Icons.radio,
+                            size: 50,
+                            color: Colors.black,
+                          ),
+                          Text(
+                            "쿠팡라디오",
+                            style: TextStyle(
+                                color: Colors.black, fontSize: 10),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ],
-              );
-            },
-          );
-        }).toList(),
-      ),
+              ),
+            ),
+          ],
+        )),
+  );
+}
+
+
+//배너이미지
+SliverAppBar _bannerImage(BuildContext context) {
+  return SliverAppBar(
+    backgroundColor: Colors.white,
+    pinned: false,
+    title: Container(
+      width: MediaQuery.of(context).size.width,
+      alignment: Alignment.topCenter,
+      child: SizedBox
+        (height: 200,
+          child: Image.asset('assets/images/banner.jpg')),
+    ),
+  );
+}
+
+//이 상품을 놓치지마세요
+Widget _prodBannerText(BuildContext context) {
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      alignment: Alignment.topCenter,
+      child: Text("이 상품 놓치지마세요!")
     );
-  }
+}
+
+//이 상품을 놓치지마세요 상품
+Widget _specialProd(BuildContext context) {
+  return SliverAppBar(
+    // expandedHeight: 500,
+    toolbarHeight: 500.h,
+    title: Container(
+        // padding: EdgeInsets.symmetric(vertical: 50.0),
+        // 컨테이너의 높이를 200으로 설정
+        height: 400.0,
+        // 리스트뷰 추가
+        child: ListView(
+          // 스크롤 방향 설정. 수평적으로 스크롤되도록 설정
+          scrollDirection: Axis.horizontal,
+          // 컨테이너들을 ListView의 자식들로 추가
+          children: <Widget>[
+            Container(
+              height: 500,
+              width: 700,
+              // width: MediaQuery.of(context).size.width,
+              padding: EdgeInsets.all(10),
+              // margin: EdgeInsets.symmetric(horizontal: 5.0),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: Column(
+                children: [
+
+                  //1단
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        children: <Widget>[
+                          Container(
+                            height: 150,
+                            width: 358.w,
+                            // width: MediaQuery.of(con).size.width,
+                            padding: EdgeInsets.only(
+                                left: 16.w, top: 21.h, bottom: 20.h, right: 16.w),
+                            decoration: (BoxDecoration(
+                              color: Colors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Color(0x22000029),
+                                  spreadRadius: 0,
+                                  blurRadius: 2,
+                                  offset: Offset(0,5), // changes position of shadow
+                                ),
+                              ],
+                              // border: Border.all(),
+                              borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(10),
+                                  topRight: Radius.circular(20),
+                                  bottomLeft: Radius.circular(20),
+                                  bottomRight: Radius.circular(20)),
+                            )),
+                            child: Column(
+                              // mainAxisSize: MainAxisSize.max,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Icon(
+                                  Icons.icecream,
+                                  size: 50,
+                                  color: Colors.black,
+                                ),
+                                SizedBox(
+                                  height: 5.h,
+                                ),
+                                Text(
+                                  "쿠팡",
+                                  style: TextStyle(
+                                      color: Colors.black, fontSize: 10),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          Container(
+                            height: 150,
+                            width: 358.w,
+                            // width: MediaQuery.of(con).size.width,
+                            padding: EdgeInsets.only(
+                                left: 16.w, top: 21.h, bottom: 20.h, right: 16.w),
+                            margin: EdgeInsets.only(bottom: 30.h),
+                            decoration: (BoxDecoration(
+                              color: Colors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Color(0x22000029),
+                                  spreadRadius: 0,
+                                  blurRadius: 2,
+                                  offset: Offset(0,5), // changes position of shadow
+                                ),
+                              ],
+                              // border: Border.all(),
+                              borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(10),
+                                  topRight: Radius.circular(20),
+                                  bottomLeft: Radius.circular(20),
+                                  bottomRight: Radius.circular(20)),
+                            )),
+                            child: Column(
+                              // mainAxisSize: MainAxisSize.max,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Icon(
+                                  Icons.icecream,
+                                  size: 50,
+                                  color: Colors.black,
+                                ),
+                                SizedBox(
+                                  height: 5.h,
+                                ),
+                                Text(
+                                  "쿠팡",
+                                  style: TextStyle(
+                                      color: Colors.black, fontSize: 10),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        children: <Widget>[
+                          Icon(
+                            Icons.mail,
+                            size: 50,
+                            color: Colors.black,
+                          ),
+                          Text(
+                            "쿠팡메일",
+                            style: TextStyle(
+                                color: Colors.black, fontSize: 10),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        children: <Widget>[
+                          Icon(
+                            Icons.local_taxi,
+                            size: 50,
+                            color: Colors.black,
+                          ),
+                          Text(
+                            "쿠팡택시",
+                            style: TextStyle(
+                                color: Colors.black, fontSize: 10),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          Icon(
+                            Icons.home,
+                            size: 50,
+                            color: Colors.black,
+                          ),
+                          Text(
+                            "쿠팡홈",
+                            style: TextStyle(
+                                color: Colors.black, fontSize: 10),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          Icon(
+                            Icons.wallet,
+                            size: 50,
+                            color: Colors.black,
+                          ),
+                          Text(
+                            "쿠팡지갑",
+                            style: TextStyle(
+                                color: Colors.black, fontSize: 10),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        children: <Widget>[
+                          Icon(
+                            Icons.radio,
+                            size: 50,
+                            color: Colors.black,
+                          ),
+                          Text(
+                            "쿠팡라디오",
+                            style: TextStyle(
+                                color: Colors.black, fontSize: 10),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+
+
+                  //2단
+                  // Row(
+                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //   children: [
+                  //     Column(
+                  //       children: <Widget>[
+                  //         Icon(
+                  //           Icons.icecream,
+                  //           size: 50,
+                  //           color: Colors.black,
+                  //         ),
+                  //         Text(
+                  //           "쿠팡",
+                  //           style: TextStyle(
+                  //               color: Colors.black, fontSize: 10),
+                  //         ),
+                  //       ],
+                  //     ),
+                  //     Column(
+                  //       children: <Widget>[
+                  //         Icon(
+                  //           Icons.mail,
+                  //           size: 50,
+                  //           color: Colors.black,
+                  //         ),
+                  //         Text(
+                  //           "쿠팡메일",
+                  //           style: TextStyle(
+                  //               color: Colors.black, fontSize: 10),
+                  //         ),
+                  //       ],
+                  //     ),
+                  //     Column(
+                  //       children: <Widget>[
+                  //         Icon(
+                  //           Icons.local_taxi,
+                  //           size: 50,
+                  //           color: Colors.black,
+                  //         ),
+                  //         Text(
+                  //           "쿠팡택시",
+                  //           style: TextStyle(
+                  //               color: Colors.black, fontSize: 10),
+                  //         ),
+                  //       ],
+                  //     ),
+                  //     Column(
+                  //       children: [
+                  //         Icon(
+                  //           Icons.home,
+                  //           size: 50,
+                  //           color: Colors.black,
+                  //         ),
+                  //         Text(
+                  //           "쿠팡홈",
+                  //           style: TextStyle(
+                  //               color: Colors.black, fontSize: 10),
+                  //         ),
+                  //       ],
+                  //     ),
+                  //     Column(
+                  //       children: [
+                  //         Icon(
+                  //           Icons.wallet,
+                  //           size: 50,
+                  //           color: Colors.black,
+                  //         ),
+                  //         Text(
+                  //           "쿠팡지갑",
+                  //           style: TextStyle(
+                  //               color: Colors.black, fontSize: 10),
+                  //         ),
+                  //       ],
+                  //     ),
+                  //     Column(
+                  //       children: <Widget>[
+                  //         Icon(
+                  //           Icons.radio,
+                  //           size: 50,
+                  //           color: Colors.black,
+                  //         ),
+                  //         Text(
+                  //           "쿠팡라디오",
+                  //           style: TextStyle(
+                  //               color: Colors.black, fontSize: 10),
+                  //         ),
+                  //       ],
+                  //     ),
+                  //   ],
+                  // ),
+                ],
+              ),
+            ),
+          ],
+        )),
+  );
+}
+
 
 
 
