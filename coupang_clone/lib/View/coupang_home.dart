@@ -187,6 +187,7 @@ SliverAppBar _mainSlider() {
       ),
       title: Stack(
         children: [
+
           CarouselSlider(
             options: CarouselOptions(
               autoPlay: true,
@@ -214,8 +215,7 @@ SliverAppBar _mainSlider() {
                         child: PageView(
                           children: [
                             SizedBox(
-                            child: Image.asset(
-                              index,
+                            child: Image.asset(index,
                               fit: BoxFit.fill,
                             ),
                           ),
@@ -223,9 +223,9 @@ SliverAppBar _mainSlider() {
                         ),
                       ),
 //메인슬라이더 인디케이터 사이 여백
-                      SizedBox(
-                        height: 5,
-                      ),
+//                       SizedBox(
+//                         height: 5,
+//                       ),
 //인디케이터
                       CarouselIndicator(
                         count: sliderList.length,
@@ -240,13 +240,37 @@ SliverAppBar _mainSlider() {
           ),
         ],
       ),
-// ),
     ),
   );
 }
 
 //아이콘슬라이더
 Widget _iconSlider(BuildContext context) {
+
+  List<String> iconList = [
+    "assets/images/prod1.jpg",
+    "assets/images/prod2.jpg",
+    "assets/images/prod3.jpg",
+    "assets/images/prod4.jpg",
+    "assets/images/prod5.jpg",
+    "assets/images/prod6.jpg",
+    "assets/images/prod7.jpg",
+    "assets/images/prod8.jpg",
+    "assets/images/prod9.jpg",
+  ];
+
+
+  List<String> iconName = [
+    "쿠팡라면",
+    "쿠팡김",
+    "쿠팡귤",
+    "큐팡수박",
+    "쿠팡포도",
+    "쿠팡사과",
+    "쿠팡호두",
+    "쿠팡바나나",
+    "쿠팡딸기",
+  ];
 
   return SliverAppBar(
     backgroundColor: Colors.transparent,
@@ -265,271 +289,65 @@ Widget _iconSlider(BuildContext context) {
           // 컨테이너의 높이를 200으로 설정
           height: 150.h,
           // 리스트뷰 추가
-          child: ListView(
+          child: ListView.builder(
             // 스크롤 방향 설정. 수평적으로 스크롤되도록 설정
             scrollDirection: Axis.horizontal,
             // 컨테이너들을 ListView의 자식들로 추가
-            children: <Widget>[
-              Container(
-                // height: 200.h,
-                width: MediaQuery.of(context).size.width,
-                // width: MediaQuery.of(context).size.width,
-                padding: EdgeInsets.only(left: 10, right: 10),
-                // margin: EdgeInsets.symmetric(horizontal: 5.0),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            itemCount: iconList.length,
+            itemBuilder: (BuildContext context, int index) {
+              return Container(
+                margin: EdgeInsets.only(left: 15,right: 10),
+                child: Row(
                   children: [
-                    //1단
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
+                    Column(
                       children: [
-                        Container(
-                          margin: EdgeInsets.only(right: 40),
-                          child: Column(
-                            children: <Widget>[
-                              Icon(
-                                Icons.icecream,
-                                // Icons.(${iconList[index]["name"]}),
-                                size: 40,
-                                color: Colors.red,
-                              ),
-                              Text(
-                                "쿠팡플레이",
-                                // "${icon_List[index]['name']}",
-                                style:
-                                    TextStyle(color: Colors.black, fontSize: 10),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(right: 40),
-                          child: Column(
-                            children: <Widget>[
-                              Icon(
-                                Icons.mail,
-                                size: 40,
-                                color: Colors.blue,
-                              ),
-                              Text(
-                                "쿠팡메일",
-                                style:
-                                    TextStyle(color: Colors.black, fontSize: 10),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(right: 40),
-                          child: Column(
-                            children: <Widget>[
-                              Icon(
-                                Icons.local_taxi,
-                                size: 40,
-                                color: Colors.yellow,
-                              ),
-                              Text(
-                                "쿠팡택시",
-                                style:
-                                    TextStyle(color: Colors.black, fontSize: 10),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(right: 40),
-                          child: Column(
-                            children: [
-                              Icon(
-                                Icons.home,
-                                size: 40,
-                                color: Colors.pink,
-                              ),
-                              Text(
-                                "쿠팡홈",
-                                style:
-                                    TextStyle(color: Colors.black, fontSize: 10),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(right: 40),
-                          child: Column(
-                            children: [
-                              Icon(
-                                Icons.wallet,
-                                size: 40,
-                                color: Colors.orange,
-                              ),
-                              Text(
-                                "쿠팡지갑",
-                                style:
-                                    TextStyle(color: Colors.black, fontSize: 10),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(right: 40),
-                          child: Column(
-                            children: <Widget>[
-                              Icon(
-                                Icons.radio,
-                                size: 40,
-                                color: Colors.green,
-                              ),
-                              Text(
-                                "쿠팡라디오",
-                                style:
-                                    TextStyle(color: Colors.black, fontSize: 10),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-
-
-
-                    //2단
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Container(
-                          margin: EdgeInsets.only(left: 5),
-                          child: Column(
-                            children: <Widget>[
-                              Icon(
-                                Icons.icecream,
-                                size: 40,
-                                color: Colors.deepPurple,
-                              ),
-                              Text(
-                                "쿠팡골드",
-                                style:
-                                    TextStyle(color: Colors.black, fontSize: 10),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(left: 5),
-                          child: Column(
-                            children: <Widget>[
-                              Icon(
-                                Icons.mail,
-                                size: 40,
-                                color: Colors.tealAccent,
-                              ),
-                              Text(
-                                "쿠팡편지",
-                                style:
-                                    TextStyle(color: Colors.black, fontSize: 10),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(left: 5),
-                          child: Column(
-                            children: <Widget>[
-                              Icon(
-                                Icons.local_taxi,
-                                size: 40,
-                                color: Colors.black,
-                              ),
-                              Text(
-                                "쿠팡배송",
-                                style:
-                                    TextStyle(color: Colors.black, fontSize: 10),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(left: 5),
-                          child: Column(
-                            children: [
-                              Icon(
-                                Icons.home,
-                                size: 40,
-                                color: Colors.lime,
-                              ),
-                              Text(
-                                "쿠팡집",
-                                style:
-                                    TextStyle(color: Colors.black, fontSize: 10),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(left: 5),
-                          child: Column(
-                            children: [
-                              Icon(
-                                Icons.wallet,
-                                size: 40,
-                                color: Colors.brown,
-                              ),
-                              Text(
-                                "쿠팡돈",
-                                style:
-                                    TextStyle(color: Colors.black, fontSize: 10),
-                              ),
-                            ],
-                          ),
-                        ),
                         Column(
                           children: <Widget>[
-                            Icon(
-                              Icons.radio,
-                              size: 40,
-                              color: Colors.grey,
-                            ),
-                            Text(
-                              "쿠팡라디오",
-                              style:
-                                  TextStyle(color: Colors.black, fontSize: 10),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
                             SizedBox(
-                              height: 50,
-                              width: 40,
-                              child: TextButton(
-                                onPressed: () {},
-                                child: Text("● ● ●"),
-                                style: TextButton.styleFrom(
-                                    primary: Colors.black,
-                                    // padding: EdgeInsets
-                                    //     .symmetric(
-                                    //     horizontal:
-                                    //     11.w,
-                                    //     vertical:
-                                    //     14.h),
-                                    textStyle: TextStyle(
-                                        fontFamily: 'NMFont',
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 5.h,
-                                        color: Color(0xffA3A3A3))),
+                              height: 50.h,
+                              width: 50.w,
+                              child: Image.asset(iconList[index],
+                                fit: BoxFit.fill,
                               ),
                             ),
+                            Text(
+                              iconName[index].toString(),
+                              // "${icon_List[index]['name']}",
+                              style:
+                              TextStyle(color: Colors.black, fontSize: 10),
+                            ),
+
+                            SizedBox(
+                              height: 15.h,
+                            ),
+
+                            Column(
+                              children: [
+                                SizedBox(
+                                  height: 50.h,
+                                  width: 50.w,
+                                  child: Image.asset(iconList[index],
+                                    fit: BoxFit.fill,
+                                  ),
+                                ),
+                                Text(
+                                  iconName[index].toString(),
+                                  // "${icon_List[index]['name']}",
+                                  style:
+                                  TextStyle(color: Colors.black, fontSize: 10),
+                                ),
+                              ],
+                            )
                           ],
                         ),
                       ],
                     ),
                   ],
                 ),
-              ),
-            ],
-          )),
+              );
+              },
+          )
+      ),
     ),
   );
 }
@@ -612,6 +430,7 @@ SliverAppBar _prodBannerText(BuildContext context) {
 Widget _specialProd(BuildContext context) {
   return SliverAppBar(
     // expandedHeight: 500,
+    backgroundColor: Color(0xffC2C2C2FF),
     toolbarHeight: 500.h,
     flexibleSpace: FlexibleSpaceBar(
       titlePadding: EdgeInsetsDirectional.only(
