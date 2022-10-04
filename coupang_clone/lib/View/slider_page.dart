@@ -2,6 +2,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:coupang_clone/View/banner_page.dart';
 import 'package:coupang_clone/View/dont_miss_page.dart';
+import 'package:coupang_clone/View/log_in_page.dart';
 import 'package:coupang_clone/View/logo_page.dart';
 import 'package:coupang_clone/View/need_it_page.dart';
 import 'package:flutter/material.dart';
@@ -173,15 +174,16 @@ class _SliderPageState extends State<SliderPage> {
                               'assets/images/logo.png',
                             ),
                       ),
+                      //로그인 화면으로 전환
                       GestureDetector(
                         onTap: () {
                           Navigator.push(context,
-                              MaterialPageRoute(builder: (_) => LogoPage()));
+                              MaterialPageRoute(builder: (_) => LogInPage()));
                         },
                         child: Container(
-                          height: 32.h,
+                          // height: 32.h,
                           margin: EdgeInsets.only(right: 20.w),
-                          child: Icon(Icons.doorbell_outlined, color: Colors.grey, size: 20.w),
+                          child: Icon(Icons.doorbell_outlined, color: Colors.grey, size: 30.w),
                           ),
                       ),
                     ],
@@ -193,16 +195,6 @@ class _SliderPageState extends State<SliderPage> {
           }),
     );
   }
-
-  // Container(
-  // width: double.infinity,
-  // color: Colors.white,
-  // padding: EdgeInsetsDirectional.only(top: 40.h, bottom: 0.h),
-  // alignment: Alignment.bottomCenter,
-  // child: Image.asset(
-  // 'assets/images/logo.png',
-  // ),
-  // ),
 
 
 //텍스트필드

@@ -39,6 +39,9 @@ dependencies:
   flutter_screenutil: ^5.5.4
   carousel_slider: ^4.1.1
   carousel_indicator: ^1.0.6
+  shared_preferences: ^2.0.15
+
+
 
 dev_dependencies:
   flutter_test:

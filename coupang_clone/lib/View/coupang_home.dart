@@ -8,9 +8,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:carousel_indicator/carousel_indicator.dart';
-
 import 'dont_miss_page.dart';
 import 'menu_page.dart';
+
 
 class CoupangeHome extends StatefulWidget {
   @override
@@ -25,8 +25,8 @@ class _CoupangeHomeState extends State<CoupangeHome> {
   String inputText = "";
   TextEditingController textController = TextEditingController();
 
-  //바텀네비게이션 초기화 변수
-  int _selectedIndex = 0;
+  //바텀네비게이션 초기화 변수(SliderPage로 첫 화면 설정)
+  int _selectedIndex = 2;
   List<Widget> _widgetOptions = [
     MenuPage(),
     Container(child: Text("INDEX ::: 1"),),
