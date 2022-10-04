@@ -2,6 +2,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:coupang_clone/View/banner_page.dart';
 import 'package:coupang_clone/View/dont_miss_page.dart';
+import 'package:coupang_clone/View/logo_page.dart';
 import 'package:coupang_clone/View/need_it_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -130,11 +131,6 @@ class _SliderPageState extends State<SliderPage> {
                 }).toList(),
               ),
             ),
-            // CarouselIndicator(
-            //   count: sliderList.length,
-            //   index: currentPos,
-            //   color: Colors.black,
-            // ),
           ],
         ),
       ),
@@ -146,7 +142,7 @@ class _SliderPageState extends State<SliderPage> {
     return SliverAppBar(
       backgroundColor: Colors.transparent,
       // expandedHeight: 30.h,
-      toolbarHeight: 60.h,
+      toolbarHeight: 50.h,
       floating: false,
       elevation: 0,
       flexibleSpace: LayoutBuilder(
@@ -161,31 +157,33 @@ class _SliderPageState extends State<SliderPage> {
                 //작은버튼일 때, 정확히 누르기 힘들기 때문에, behavior을 줘서 주변 마진만큼 범위 확장 시킨다.(translucent는 투명한 부분에,투명영역까지 범위) 반대로 오페큐는 딱 아이콘모양만 터치영역
                 behavior: HitTestBehavior.translucent,
                 child: Container(
+                  padding: EdgeInsets.only(top: 40.h),
                   width: MediaQuery.of(context).size.width,
-                  alignment: Alignment.centerLeft,
+                  // alignment: Alignment.centerRight,
                   // padding: EdgeInsets.only(left: 0,top: 2,right: 1, bottom: 5),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    // crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Container(
-                        height: 35.h,
-                        child: Row(
-                          children: [
+                        margin: EdgeInsets.only(left: 140.w),
+                        // height: 35.h,
+                        child:
                             Image.asset(
                               'assets/images/logo.png',
                             ),
-                          ],
-                        ),
                       ),
-                      Container(
-                        height: 32.h,
-                        child: Icon(Icons.doorbell_outlined, color: Colors.grey, size: 15.w),
-                          // onPressed: () {
-                          //   Navigator.push(context,
-                          //       MaterialPageRoute(builder: (_) => DontMissPage()));
-                          // },
-                        ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(context,
+                              MaterialPageRoute(builder: (_) => LogoPage()));
+                        },
+                        child: Container(
+                          height: 32.h,
+                          margin: EdgeInsets.only(right: 20.w),
+                          child: Icon(Icons.doorbell_outlined, color: Colors.grey, size: 20.w),
+                          ),
+                      ),
                     ],
                   ),
                 ),
