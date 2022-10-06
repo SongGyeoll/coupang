@@ -1,12 +1,4 @@
 
-
-
-
-
-
-
-
-
 const icon_List = [
   //map타입.key value pair방식(한쌍.짝)
   {
