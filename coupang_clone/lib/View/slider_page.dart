@@ -5,8 +5,10 @@ import 'package:coupang_clone/View/dont_miss_page.dart';
 import 'package:coupang_clone/View/log_in_page.dart';
 import 'package:coupang_clone/View/logo_page.dart';
 import 'package:coupang_clone/View/need_it_page.dart';
+import 'package:coupang_clone/View/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 
@@ -174,11 +176,17 @@ class _SliderPageState extends State<SliderPage> {
                               'assets/images/logo.png',
                             ),
                       ),
-                      //로그인 화면으로 전환
+
+                      //로그아웃
                       GestureDetector(
-                        onTap: () {
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (_) => LogInPage()));
+                        onTap: () async {
+                          SharedPreferences _prefs = await SharedPreferences.getInstance();
+                          bool isAuto = false;
+                          _prefs.setBool("false", isAuto);
+                          Navigator.of(context).pushReplacementNamed(Routes.login);
+
+                          // Navigator.push(context,
+                          //     MaterialPageRoute(builder: (_) => LogInPage()));
                         },
                         child: Container(
                           // height: 32.h,

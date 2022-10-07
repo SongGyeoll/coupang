@@ -23,6 +23,10 @@ class _MembershipPageState extends State<MembershipPage> {
   //특정 이벤트가 발생하였을 때, 현재 입력된 값에 접근하고 싶을 때도 있다. 이때 사용하는 것이 TextEditingController.
   TextEditingController textController = TextEditingController();
 
+  // 텍스트를 받아오기 위한 선언
+  final idController = TextEditingController();
+  final pwController = TextEditingController();
+
   //자동로그인 토글
   bool _switchValue = true;
   final formKey = GlobalKey<FormState>();
@@ -31,60 +35,17 @@ class _MembershipPageState extends State<MembershipPage> {
   var _isChecked = false;
 
   Gender _gender = Gender.MAN;
-  // String _gender = "남자";
-
-  // List<String> _genderList = ["남자", "여자"];
-  // String _selectedGender = "";
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  renderTextFormField({
-    required String label,
-    required FormFieldSetter onSaved,
-    required FormFieldValidator validator,
-  }) {
-    assert(onSaved != null);
-    assert(validator != null);
-
-    return Column(
-      children: [
-        Row(
-          children: [
-            Text(
-              label,
-              style: TextStyle(
-                  fontSize: 12.0,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.black),
-            ),
-            TextFormField(
-              onSaved: onSaved,
-              validator: validator,
-            ),
-          ],
-        ),
-      ],
-    );
-  }
 
   // 캐싱을 위한 선언
   String _id = '';
   String _pw = '';
   late SharedPreferences _prefs;
 
-  // 텍스트를 받아오기 위한 선언
-  final idController = TextEditingController();
-  final pwController = TextEditingController();
-
   // 위젯이 생성될 때 처음으로 호출되고, 단 한번만 호출된다.
   @override
   void initState() {
     super.initState(); // initState()를 사용할 때 반드시 사용해야 한다.
-    _loadId(); // 이 함수를 실행한다.
+    _loadId();
   }
 
 // 캐시에 있는 데이터를 불러오는 함수
@@ -96,10 +57,22 @@ class _MembershipPageState extends State<MembershipPage> {
       // SharedPreferences에 id, pw로 저장된 값을 읽어 필드에 저장. 없을 경우 0으로 대입
       _id = (_prefs.getString('id') ?? '');
       _pw = (_prefs.getString('pw') ?? '');
-      print(_id); // Run 기록으로 id와 pw의 값을 확인할 수 있음.
+      print(_id);
       print(_pw);
     });
   }
+
+  //화면이 죽을 때 dispose돈다
+  @override
+  void dispose() {
+    super.dispose();
+    //상태바 다시 흰색으로.
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+        statusBarColor: Colors.white,
+        statusBarBrightness: Brightness.dark,
+        statusBarIconBrightness: Brightness.dark));
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -136,7 +109,7 @@ class _MembershipPageState extends State<MembershipPage> {
                             //큰차이점 = Inkwell은 터치시 이벤트 효과가 들어간다.
                             GestureDetector(
                                 onTap: () {
-                                  Navigator.pop(context);
+                                  Navigator.pop(context, "C");
                                 },
                                 //작은버튼일 때, 정확히 누르기 힘들기 때문에, behavior을 줘서 주변 마진만큼 범위 확장 시킨다.(translucent는 투명한 부분에,투명영역까지 범위) 반대로 오페큐는 딱 아이콘모양만 터치영역
                                 behavior: HitTestBehavior.translucent,
@@ -177,7 +150,6 @@ class _MembershipPageState extends State<MembershipPage> {
                             height: 60.h,
                             width: 250.w,
                             child: TextFormField(
-                              onSaved: (String? val) {},
                               //autovalidateMode 는 FormField가 가지고 있는 속성을 상속받은 것인데, validator에 지정된 유효성 검사에서 반환된 에러 메시지를 자동으로 띄워주는 역할을 한다.
                               // (사실 validator만 설정하면 되는 줄 알고 엄청 헤맸는데, autovalidateMode의 기본값은 autovalidateMode.disabled였다...)
                               autovalidateMode: AutovalidateMode.always,
@@ -257,7 +229,6 @@ class _MembershipPageState extends State<MembershipPage> {
                             validator: (String? val) {
                               if(val!.length < 1) {
                                 return "비밀번호 필수";
-
                               }
                               if(val.length < 4) {
                                 return '비밀번호는 네 글자 이상 입력.';
@@ -322,6 +293,8 @@ class _MembershipPageState extends State<MembershipPage> {
                             validator: (String? val) {
                               if(val != _pw) {
                                 return "비밀번호는 같아야 합니다.";
+                              } else {
+                                return "확인완료";
                               }
                               return null;
                             },
@@ -434,7 +407,7 @@ class _MembershipPageState extends State<MembershipPage> {
                           margin: EdgeInsets.only(right: 15.w),
                           height: 50.h,
                           width: 250.w,
-                          child: TextField(
+                          child: TextFormField(
                             scrollPadding: EdgeInsets.only(
                                 bottom:
                                     MediaQuery.of(context).viewInsets.bottom),
@@ -442,7 +415,15 @@ class _MembershipPageState extends State<MembershipPage> {
                             textAlignVertical: TextAlignVertical.center,
                             // controller: textController,
                             keyboardType: TextInputType.phone,
-                            inputFormatters: [LengthLimitingTextInputFormatter(11)],
+
+                            // inputFormatters: [
+                            //   FilteringTextInputFormatter.allow(
+                            //       RegExp(r'^([0-9]{3})-?([0-9]{4})-?([0-9]{4})$'))
+                            // ],
+                            //11자리 제한
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(11)
+                            ],
                             decoration: InputDecoration(
                               hintText: " '-' 구분 없이 입력.",
                               hintStyle: TextStyle(
@@ -580,30 +561,7 @@ class _MembershipPageState extends State<MembershipPage> {
                                       _gender = value as Gender;
                                     });
                                   }),
-                              // ListTile <String>(
-                              //   title: Text("남자"),
-                              //   leading: Radio(
-                              //     value: Gender.MAN,
-                              //     groupValue: _gender,
-                              //     onChanged: (value) {
-                              //       setState(() {
-                              //         _gender = value!;
-                              //       });
-                              //     },
-                              //   ),
-                              // ),
-                              // ListTile(
-                              //   title: Text("여자"),
-                              //   leading: Radio(
-                              //     value: Gender.WOMEN,
-                              //     groupValue: _gender,
-                              //     onChanged: (value) {
-                              //       setState(() {
-                              //         _gender = value;
-                              //       });
-                              //     },
-                              //   ),
-                              // ),
+
                               Text(
                                 '아이디: $_id 비밀번호: $_pw',
                               ), // 어플을 재시작해도 데이터가 보존되는지 확인하기 위한 Text창
@@ -634,11 +592,11 @@ class _MembershipPageState extends State<MembershipPage> {
                 ),
                 //회원가입 설정
                 onPressed: () {
-
                   _id = idController.text; // _id 에 입력받은 값 넣어줌
                   _pw = pwController.text; // _pw 에 입력받은 값 넣어줌
                   _prefs.setString(
                       'id', _id); // id를 키로 가지고 있는 값에 입력받은 _id를 넣어줌. = 캐시에 넣어줌
+
                   _prefs.setString(
                       'pw', _pw); // pw를 키로 가지고 있는 값에 입력받은 _pw를 넣어줌. = 캐시에 넣어줌
                   logger.d("id===== ${_id = idController.text}");
@@ -661,24 +619,6 @@ class _MembershipPageState extends State<MembershipPage> {
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _builContextList(BuildContext con) {
-    return Container(
-      height: MediaQuery.of(context).size.height,
-      child: Column(
-        children: [
-          Container(
-            child: renderTextFormField(
-                label: "ID",
-                onSaved: (val) {},
-                validator: (val) {
-                  return null;
-                }),
-          )
-        ],
       ),
     );
   }

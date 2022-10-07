@@ -1,3 +1,4 @@
+import 'package:coupang_clone/View/log_in_page.dart';
 import 'package:coupang_clone/View/menu_page.dart';
 import 'package:coupang_clone/View/splash_screen.dart';
 import 'package:flutter/cupertino.dart';
@@ -11,11 +12,13 @@ class Routes {
   static String splash = '/splash';
   static String coupang = '/coupang';
   static String menu = '/menu';
+  static String login = "/login";
 
 
   static final routes = <String, WidgetBuilder>{
     splash: (context) => SlpashScreen(),
     coupang: (context) => CoupangeHome(),
     menu: (context) => MenuPage(),
+    login: (context) => LogInPage(),
   };
 }
