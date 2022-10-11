@@ -1,11 +1,13 @@
+import 'dart:async';
+
 import 'package:coupang_clone/Util/logger.dart';
+import 'package:coupang_clone/View/routes.dart';
 import 'package:coupang_clone/View/slider_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 
 class MembershipPage extends StatefulWidget {
   const MembershipPage({Key? key}) : super(key: key);
@@ -27,6 +29,9 @@ class _MembershipPageState extends State<MembershipPage> {
   final idController = TextEditingController();
   final pwController = TextEditingController();
 
+  // 상태위젯 상태변수로 선언
+  DateTime? currentBackPressTime;
+
   //자동로그인 토글
   bool _switchValue = true;
   final formKey = GlobalKey<FormState>();
@@ -40,6 +45,17 @@ class _MembershipPageState extends State<MembershipPage> {
   String _id = '';
   String _pw = '';
   late SharedPreferences _prefs;
+
+  //Timer_3초 후 navigate실행
+  startTimer() {
+    var _duration = Duration(milliseconds: 1500);
+    return Timer(_duration, navigate);
+  }
+  //navegate_화면전환 (회원가입 완료 후 로그인 페이지로)
+  navigate() async {
+    //pushReplacementNamed pushRelacementNamed 메서드는 현재 페이지가 대체
+    Navigator.of(context).pushReplacementNamed(Routes.login);
+  }
 
   // 위젯이 생성될 때 처음으로 호출되고, 단 한번만 호출된다.
   @override
@@ -73,548 +89,588 @@ class _MembershipPageState extends State<MembershipPage> {
         statusBarIconBrightness: Brightness.dark));
   }
 
-
   @override
   Widget build(BuildContext context) {
     //상태바 색상 설정
     SystemChrome.setSystemUIOverlayStyle(
         SystemUiOverlayStyle(statusBarColor: Colors.amberAccent));
-    return Form(
-      key: this.formKey,
-      child: Material(
-        color: Color(0xffF5F5F5),
-        child: Scaffold(
-          body: SingleChildScrollView(
-            child: Container(
-              //MediaQuery는 반응형(앱에 사이즈에 맞는 가로나,세로의 값을 가져온다.)
-              //MediaQuery.of(context).size.height = 앱 디바이스의 높이
-              height: MediaQuery.of(context).size.height,
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height,
-                child: Column(
-                  children: [
-                    Container(
-                      height: 150.h - MediaQuery.of(context).padding.top,
-                      width: 390.w,
-                      alignment: Alignment.topCenter,
-                      decoration: (const BoxDecoration(
-                        color: Colors.amberAccent,
-                      )),
-                      child: Container(
-                        margin: EdgeInsets.only(
-                            top: 32.h + MediaQuery.of(context).padding.top),
-                        child: Row(
-                          children: [
-                            //큰차이점 = Inkwell은 터치시 이벤트 효과가 들어간다.
-                            GestureDetector(
-                                onTap: () {
-                                  Navigator.pop(context, "C");
-                                },
-                                //작은버튼일 때, 정확히 누르기 힘들기 때문에, behavior을 줘서 주변 마진만큼 범위 확장 시킨다.(translucent는 투명한 부분에,투명영역까지 범위) 반대로 오페큐는 딱 아이콘모양만 터치영역
-                                behavior: HitTestBehavior.translucent,
-                                child: Container(
-                                  margin: EdgeInsets.only(
-                                      left: 16.w, right: 24.77.w),
-                                  child:
-                                      Image.asset('assets/images/backkey.png'),
-                                )),
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).requestFocus(new FocusNode());
+      },
+      behavior: HitTestBehavior.opaque,
+      child: Form(
+        key: this.formKey,
+        child: Material(
+          color: Color(0xffF5F5F5),
+          child: WillPopScope(
+            onWillPop: () async {
+              DateTime now = DateTime.now();
+              //상태변화가 없거나,새로 상태가 변경됐을 때, 5초간격보다 클 때, [스낵바 띄우기 + "시간 초기화" ]
+              if (currentBackPressTime == null ||
+                  now.difference(currentBackPressTime!) > Duration(seconds: 5)) {
+                //시간초기화
+                currentBackPressTime = now;
+                //백키처리 스낵바
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Row(
+                      children: [
+                        Icon(
+                          Icons.notification_important,
+                          color: Colors.white,
+                        ),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            '뒤로가기 버튼을 한 번 더 누르시면 종료됩니다.',
+                            //컨텍스트의 주제
+                            style: Theme.of(context)
+                                .textTheme
+                                .subtitle1!
+                                .copyWith(color: Colors.white),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+                return Future.value(false);
+              }
+              return Future.value(true);
+            },
+            child: Scaffold(
+              body: SingleChildScrollView(
+                child: Container(
+                  //MediaQuery는 반응형(앱에 사이즈에 맞는 가로나,세로의 값을 가져온다.)
+                  //MediaQuery.of(context).size.height = 앱 디바이스의 높이
+                  height: MediaQuery.of(context).size.height,
+                  child: Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height,
+                    child: Column(
+                      children: [
+                        Container(
+                          height: 150.h - MediaQuery.of(context).padding.top,
+                          width: 390.w,
+                          alignment: Alignment.topCenter,
+                          decoration: (const BoxDecoration(
+                            color: Colors.amberAccent,
+                          )),
+                          child: Container(
+                            margin: EdgeInsets.only(
+                                top: 32.h + MediaQuery.of(context).padding.top),
+                            child: Row(
+                              children: [
+                                //큰차이점 = Inkwell은 터치시 이벤트 효과가 들어간다.
+                                GestureDetector(
+                                    onTap: () {
+                                      Navigator.pop(context, "C");
+                                    },
+                                    //작은버튼일 때, 정확히 누르기 힘들기 때문에, behavior을 줘서 주변 마진만큼 범위 확장 시킨다.(translucent는 투명한 부분에,투명영역까지 범위) 반대로 오페큐는 딱 아이콘모양만 터치영역
+                                    behavior: HitTestBehavior.translucent,
+                                    child: Container(
+                                      margin: EdgeInsets.only(
+                                          left: 16.w, right: 24.77.w),
+                                      child: Image.asset(
+                                          'assets/images/backkey.png'),
+                                    )),
 
-
-                            Container(
-                              // alignment: Alignment.center,
-                              margin: EdgeInsets.only(left: 60.w),
-                              child: Text(
-                                "회원가입",
-                                style: TextStyle(
-                                    fontSize: 25.h,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black),
-                              ),
+                                Container(
+                                  // alignment: Alignment.center,
+                                  margin: EdgeInsets.only(left: 60.w),
+                                  child: Text(
+                                    "회원가입",
+                                    style: TextStyle(
+                                        fontSize: 25.h,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black),
+                                  ),
+                                ),
+                              ],
                             ),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(top: 20.h),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                margin: EdgeInsets.only(left: 15.w, bottom: 20.w),
+                                child: Text("아이디"),
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(right: 15.w),
+                                height: 60.h,
+                                width: 250.w,
+                                child: TextFormField(
+                                  //autovalidateMode 는 FormField가 가지고 있는 속성을 상속받은 것인데, validator에 지정된 유효성 검사에서 반환된 에러 메시지를 자동으로 띄워주는 역할을 한다.
+                                  // (사실 validator만 설정하면 되는 줄 알고 엄청 헤맸는데, autovalidateMode의 기본값은 autovalidateMode.disabled였다...)
+                                  autovalidateMode: AutovalidateMode.always,
+                                  validator: (String? val) {
+                                    if (val!.length < 1) {
+                                      return "아이디 필수";
+                                    }
+                                    if (val.length < 2) {
+                                      return '아이디는 두 글자 이상 입력.';
+                                    }
+                                    return null;
+                                  },
+                                  scrollPadding: EdgeInsets.only(
+                                      bottom: MediaQuery.of(context)
+                                          .viewInsets
+                                          .bottom),
+                                  textInputAction: TextInputAction.next,
+                                  textAlignVertical: TextAlignVertical.center,
+                                  controller: idController,
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.allow(
+                                        RegExp('[a-z0-9]'))
+                                  ],
+                                  decoration: InputDecoration(
+                                    hintText: "아이디를 입력하세요.",
+                                    hintStyle: TextStyle(
+                                        fontSize: 15.w, color: Color(0xffA3A3A3)),
+                                    contentPadding: EdgeInsets.only(left: 10.w),
+                                    //테두리두께
+                                    border: const OutlineInputBorder(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(2.0)),
+                                    ),
+
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Color(0xffCBCBCB), width: 2.0),
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(5.0)),
+                                    ),
+
+                                    //텍스트필드 선택시 포커스 라인
+                                    focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Color(0xffCBCBCB), width: 2.0),
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(5.0)),
+                                    ),
+                                  ),
+                                  maxLines: 1,
+                                  minLines: 1,
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10.h,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              margin: EdgeInsets.only(left: 15.w, bottom: 20.w),
+                              child: Text("비밀번호"),
+                            ),
+                            Container(
+                              margin: EdgeInsets.only(right: 15.w),
+                              height: 60.h,
+                              width: 250.w,
+                              child: TextFormField(
+                                onSaved: (String? val) {},
+                                onChanged: (text) {
+                                  _pw = text;
+                                },
+                                autovalidateMode: AutovalidateMode.always,
+                                validator: (String? val) {
+                                  if (val!.length < 1) {
+                                    return "비밀번호 필수";
+                                  }
+                                  if (val.length < 4) {
+                                    return '비밀번호는 네 글자 이상 입력.';
+                                  }
+                                  return null;
+                                },
+                                scrollPadding: EdgeInsets.only(
+                                    bottom:
+                                        MediaQuery.of(context).viewInsets.bottom),
+                                textInputAction: TextInputAction.next,
+                                textAlignVertical: TextAlignVertical.center,
+                                controller: pwController,
+                                decoration: InputDecoration(
+                                  hintText: "비밀번호를 입력하세요.",
+                                  hintStyle: TextStyle(
+                                      fontSize: 15.w, color: Color(0xffA3A3A3)),
+                                  contentPadding: EdgeInsets.only(left: 10.w),
+                                  //테두리두께
+                                  border: const OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(2.0)),
+                                  ),
+
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Color(0xffCBCBCB), width: 2.0),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(5.0)),
+                                  ),
+
+                                  //텍스트필드 선택시 포커스 라인
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Color(0xffCBCBCB), width: 2.0),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(5.0)),
+                                  ),
+                                ),
+                                maxLines: 1,
+                                minLines: 1,
+                              ),
+                            )
                           ],
                         ),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 20.h),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Container(
-                            margin: EdgeInsets.only(left: 15.w, bottom: 20.w),
-                            child: Text("아이디"),
-                          ),
-                          Container(
-                            margin: EdgeInsets.only(right: 15.w),
-                            height: 60.h,
-                            width: 250.w,
-                            child: TextFormField(
-                              //autovalidateMode 는 FormField가 가지고 있는 속성을 상속받은 것인데, validator에 지정된 유효성 검사에서 반환된 에러 메시지를 자동으로 띄워주는 역할을 한다.
-                              // (사실 validator만 설정하면 되는 줄 알고 엄청 헤맸는데, autovalidateMode의 기본값은 autovalidateMode.disabled였다...)
-                              autovalidateMode: AutovalidateMode.always,
-                              validator: (String? val) {
-                                if(val!.length < 1) {
-                                  return "아이디 필수";
+                        SizedBox(
+                          height: 20.h,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              margin: EdgeInsets.only(left: 15.w, bottom: 20.w),
+                              child: Text("비밀번호 확인"),
+                            ),
+                            Container(
+                              margin: EdgeInsets.only(right: 15.w),
+                              height: 60.h,
+                              width: 250.w,
+                              child: TextFormField(
+                                onSaved: (String? val) {},
+                                autovalidateMode: AutovalidateMode.always,
+                                validator: (String? val) {
+                                  if (val != _pw) {
+                                    return "비밀번호는 같아야 합니다.";
+                                  } else {
+                                    return "확인완료";
+                                  }
+                                  return null;
+                                },
+                                scrollPadding: EdgeInsets.only(
+                                    bottom:
+                                        MediaQuery.of(context).viewInsets.bottom),
+                                textInputAction: TextInputAction.next,
+                                textAlignVertical: TextAlignVertical.center,
+                                controller: textController,
+                                decoration: InputDecoration(
+                                  hintText: "비밀번호 확인.",
+                                  hintStyle: TextStyle(
+                                      fontSize: 15.w, color: Color(0xffA3A3A3)),
+                                  contentPadding: EdgeInsets.only(left: 10.w),
+                                  //테두리두께
+                                  border: const OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(2.0)),
+                                  ),
 
-                                }
-                                if(val.length < 2) {
-                                  return '아이디는 두 글자 이상 입력.';
-                                }
-                                return null;
-                              },
-                              scrollPadding: EdgeInsets.only(
-                                  bottom:
-                                      MediaQuery.of(context).viewInsets.bottom),
-                              textInputAction: TextInputAction.next,
-                              textAlignVertical: TextAlignVertical.center,
-                              controller: idController,
-                              inputFormatters: [
-                                FilteringTextInputFormatter.allow(
-                                    RegExp('[a-z0-9]'))
-                              ],
-                              decoration: InputDecoration(
-                                hintText: "아이디를 입력하세요.",
-                                hintStyle: TextStyle(
-                                    fontSize: 15.w, color: Color(0xffA3A3A3)),
-                                contentPadding: EdgeInsets.only(left: 10.w),
-                                //테두리두께
-                                border: const OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(2.0)),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Color(0xffCBCBCB), width: 2.0),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(5.0)),
+                                  ),
+
+                                  //텍스트필드 선택시 포커스 라인
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Color(0xffCBCBCB), width: 2.0),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(5.0)),
+                                  ),
                                 ),
+                                maxLines: 1,
+                                minLines: 1,
+                              ),
+                            )
+                          ],
+                        ),
+                        SizedBox(
+                          height: 20.h,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              margin: EdgeInsets.only(left: 15.w),
+                              child: Text("이 름"),
+                            ),
+                            Container(
+                              margin: EdgeInsets.only(right: 15.w),
+                              height: 50.h,
+                              width: 250.w,
+                              child: TextField(
+                                scrollPadding: EdgeInsets.only(
+                                    bottom:
+                                        MediaQuery.of(context).viewInsets.bottom),
+                                textInputAction: TextInputAction.next,
+                                textAlignVertical: TextAlignVertical.center,
+                                // controller: textController,
+                                // inputFormatters: [
+                                //   FilteringTextInputFormatter.allow(
+                                //       RegExp('[ㄱ-ㅎ가-힣]'))
+                                // ],
+                                decoration: InputDecoration(
+                                  hintText: "실명을 입력하세요.",
+                                  hintStyle: TextStyle(
+                                      fontSize: 15.w, color: Color(0xffA3A3A3)),
+                                  contentPadding: EdgeInsets.only(left: 10.w),
+                                  //테두리두께
+                                  border: const OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(2.0)),
+                                  ),
 
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: Color(0xffCBCBCB), width: 2.0),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(5.0)),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Color(0xffCBCBCB), width: 2.0),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(5.0)),
+                                  ),
+
+                                  //텍스트필드 선택시 포커스 라인
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Color(0xffCBCBCB), width: 2.0),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(5.0)),
+                                  ),
                                 ),
+                                maxLines: 1,
+                                minLines: 1,
+                              ),
+                            )
+                          ],
+                        ),
+                        SizedBox(
+                          height: 20.h,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              margin: EdgeInsets.only(left: 15.w),
+                              child: Text("휴대폰 번호"),
+                            ),
+                            Container(
+                              margin: EdgeInsets.only(right: 15.w),
+                              height: 50.h,
+                              width: 250.w,
+                              child: TextFormField(
+                                scrollPadding: EdgeInsets.only(
+                                    bottom:
+                                        MediaQuery.of(context).viewInsets.bottom),
+                                textInputAction: TextInputAction.next,
+                                textAlignVertical: TextAlignVertical.center,
+                                // controller: textController,
+                                keyboardType: TextInputType.phone,
 
-                                //텍스트필드 선택시 포커스 라인
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: Color(0xffCBCBCB), width: 2.0),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(5.0)),
+                                // inputFormatters: [
+                                //   FilteringTextInputFormatter.allow(
+                                //       RegExp(r'^([0-9]{3})-?([0-9]{4})-?([0-9]{4})$'))
+                                // ],
+                                //11자리 제한
+                                inputFormatters: [
+                                  LengthLimitingTextInputFormatter(11)
+                                ],
+                                decoration: InputDecoration(
+                                  hintText: " '-' 구분 없이 입력.",
+                                  hintStyle: TextStyle(
+                                      fontSize: 15.w, color: Color(0xffA3A3A3)),
+                                  contentPadding: EdgeInsets.only(left: 10.w),
+                                  //테두리두께
+                                  border: const OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(2.0)),
+                                  ),
+
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Color(0xffCBCBCB), width: 2.0),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(5.0)),
+                                  ),
+
+                                  //텍스트필드 선택시 포커스 라인
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Color(0xffCBCBCB), width: 2.0),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(5.0)),
+                                  ),
                                 ),
+                                maxLines: 1,
+                                minLines: 1,
                               ),
-                              maxLines: 1,
-                              minLines: 1,
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      height: 10.h,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          margin: EdgeInsets.only(left: 15.w, bottom: 20.w),
-                          child: Text("비밀번호"),
+                            )
+                          ],
                         ),
-                        Container(
-                          margin: EdgeInsets.only(right: 15.w),
-                          height: 60.h,
-                          width: 250.w,
-                          child: TextFormField(
-                            onSaved: (String? val) {},
-                            onChanged: (text) {
-                              _pw = text;
-                            },
-                            autovalidateMode: AutovalidateMode.always,
-                            validator: (String? val) {
-                              if(val!.length < 1) {
-                                return "비밀번호 필수";
-                              }
-                              if(val.length < 4) {
-                                return '비밀번호는 네 글자 이상 입력.';
-                              }
-                              return null;
-                            },
-                            scrollPadding: EdgeInsets.only(
-                                bottom:
-                                    MediaQuery.of(context).viewInsets.bottom),
-                            textInputAction: TextInputAction.next,
-                            textAlignVertical: TextAlignVertical.center,
-                            controller: pwController,
-                            decoration: InputDecoration(
-                              hintText: "비밀번호를 입력하세요.",
-                              hintStyle: TextStyle(
-                                  fontSize: 15.w, color: Color(0xffA3A3A3)),
-                              contentPadding: EdgeInsets.only(left: 10.w),
-                              //테두리두께
-                              border: const OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(2.0)),
-                              ),
-
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: Color(0xffCBCBCB), width: 2.0),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(5.0)),
-                              ),
-
-                              //텍스트필드 선택시 포커스 라인
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: Color(0xffCBCBCB), width: 2.0),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(5.0)),
-                              ),
+                        SizedBox(
+                          height: 20.h,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              margin: EdgeInsets.only(left: 15.w),
+                              child: Text("E-MAIL"),
                             ),
-                            maxLines: 1,
-                            minLines: 1,
-                          ),
-                        )
+                            Container(
+                              margin: EdgeInsets.only(right: 15.w),
+                              height: 50.h,
+                              width: 250.w,
+                              child: TextFormField(
+                                onSaved: (String? val) {},
+                                autovalidateMode: AutovalidateMode.always,
+                                validator: (String? val) {
+                                  validateEmail(val);
+                                  // if(val == null || val.isEmpty) {
+                                  //   return "이메일을 입력해주세요";
+                                  // }
+                                  // return null;
+                                },
+                                scrollPadding: EdgeInsets.only(
+                                    bottom:
+                                        MediaQuery.of(context).viewInsets.bottom),
+                                textInputAction: TextInputAction.next,
+                                textAlignVertical: TextAlignVertical.center,
+                                // controller: textController,
+                                // inputFormatters: [
+                                //   FilteringTextInputFormatter.allow(
+                                //       RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$'))
+                                // ],
+                                keyboardType: TextInputType.emailAddress,
+                                decoration: InputDecoration(
+                                  hintText: " @ ",
+                                  hintStyle: TextStyle(
+                                      fontSize: 15.w, color: Color(0xffA3A3A3)),
+                                  contentPadding: EdgeInsets.only(left: 10.w),
+                                  //테두리두께
+                                  border: const OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(2.0)),
+                                  ),
+
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Color(0xffCBCBCB), width: 2.0),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(5.0)),
+                                  ),
+
+                                  //텍스트필드 선택시 포커스 라인
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Color(0xffCBCBCB), width: 2.0),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(5.0)),
+                                  ),
+                                ),
+                                maxLines: 1,
+                                minLines: 1,
+                              ),
+                            )
+                          ],
+                        ),
+                        SizedBox(
+                          height: 10.h,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              margin: EdgeInsets.only(left: 15.w),
+                              child: Text("성 별"),
+                            ),
+                            Container(
+                              margin: EdgeInsets.only(right: 15.w),
+                              height: 150.h,
+                              width: 250.w,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  //오류의 원인은 마지막 onChanged의 value가 Object?의 형식인데 String형식인 _selectedValue에 넣은 것이다. 그러므로 다음의 두가지를 해결해주면 오류는 없어지게 된다.
+                                  // value가 Object가 아닌 String으로 만들기
+                                  // value가 null인지 아닌지 체크하기 (null safety)
+                                  RadioListTile(
+                                      title: Text("남자"),
+                                      value: Gender.MAN,
+                                      groupValue: _gender,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _gender = value as Gender;
+                                        });
+                                      }),
+                                  RadioListTile(
+                                      title: Text("여자"),
+                                      value: Gender.WOMEN,
+                                      groupValue: _gender,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _gender = value as Gender;
+                                        });
+                                      }),
+
+                                  Text(
+                                    '아이디: $_id 비밀번호: $_pw',
+                                  ),
+                                  // 어플을 재시작해도 데이터가 보존되는지 확인하기 위한 Text창
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
                       ],
                     ),
-                    SizedBox(
-                      height: 20.h,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          margin: EdgeInsets.only(left: 15.w, bottom: 20.w),
-                          child: Text("비밀번호 확인"),
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(right: 15.w),
-                          height: 60.h,
-                          width: 250.w,
-                          child: TextFormField(
-                            onSaved: (String? val) {},
-                            autovalidateMode: AutovalidateMode.always,
-                            validator: (String? val) {
-                              if(val != _pw) {
-                                return "비밀번호는 같아야 합니다.";
-                              } else {
-                                return "확인완료";
-                              }
-                              return null;
-                            },
-                            scrollPadding: EdgeInsets.only(
-                                bottom:
-                                    MediaQuery.of(context).viewInsets.bottom),
-                            textInputAction: TextInputAction.next,
-                            textAlignVertical: TextAlignVertical.center,
-                            controller: textController,
-                            decoration: InputDecoration(
-                              hintText: "비밀번호 확인.",
-                              hintStyle: TextStyle(
-                                  fontSize: 15.w, color: Color(0xffA3A3A3)),
-                              contentPadding: EdgeInsets.only(left: 10.w),
-                              //테두리두께
-                              border: const OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(2.0)),
-                              ),
-
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: Color(0xffCBCBCB), width: 2.0),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(5.0)),
-                              ),
-
-                              //텍스트필드 선택시 포커스 라인
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: Color(0xffCBCBCB), width: 2.0),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(5.0)),
-                              ),
-                            ),
-                            maxLines: 1,
-                            minLines: 1,
-                          ),
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: 20.h,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          margin: EdgeInsets.only(left: 15.w),
-                          child: Text("이 름"),
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(right: 15.w),
-                          height: 50.h,
-                          width: 250.w,
-                          child: TextField(
-                            scrollPadding: EdgeInsets.only(
-                                bottom:
-                                    MediaQuery.of(context).viewInsets.bottom),
-                            textInputAction: TextInputAction.next,
-                            textAlignVertical: TextAlignVertical.center,
-                            // controller: textController,
-                            // inputFormatters: [
-                            //   FilteringTextInputFormatter.allow(
-                            //       RegExp('[ㄱ-ㅎ가-힣]'))
-                            // ],
-                            decoration: InputDecoration(
-                              hintText: "실명을 입력하세요.",
-                              hintStyle: TextStyle(
-                                  fontSize: 15.w, color: Color(0xffA3A3A3)),
-                              contentPadding: EdgeInsets.only(left: 10.w),
-                              //테두리두께
-                              border: const OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(2.0)),
-                              ),
-
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: Color(0xffCBCBCB), width: 2.0),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(5.0)),
-                              ),
-
-                              //텍스트필드 선택시 포커스 라인
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: Color(0xffCBCBCB), width: 2.0),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(5.0)),
-                              ),
-                            ),
-                            maxLines: 1,
-                            minLines: 1,
-                          ),
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: 20.h,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          margin: EdgeInsets.only(left: 15.w),
-                          child: Text("휴대폰 번호"),
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(right: 15.w),
-                          height: 50.h,
-                          width: 250.w,
-                          child: TextFormField(
-                            scrollPadding: EdgeInsets.only(
-                                bottom:
-                                    MediaQuery.of(context).viewInsets.bottom),
-                            textInputAction: TextInputAction.next,
-                            textAlignVertical: TextAlignVertical.center,
-                            // controller: textController,
-                            keyboardType: TextInputType.phone,
-
-                            // inputFormatters: [
-                            //   FilteringTextInputFormatter.allow(
-                            //       RegExp(r'^([0-9]{3})-?([0-9]{4})-?([0-9]{4})$'))
-                            // ],
-                            //11자리 제한
-                            inputFormatters: [
-                              LengthLimitingTextInputFormatter(11)
-                            ],
-                            decoration: InputDecoration(
-                              hintText: " '-' 구분 없이 입력.",
-                              hintStyle: TextStyle(
-                                  fontSize: 15.w, color: Color(0xffA3A3A3)),
-                              contentPadding: EdgeInsets.only(left: 10.w),
-                              //테두리두께
-                              border: const OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(2.0)),
-                              ),
-
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: Color(0xffCBCBCB), width: 2.0),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(5.0)),
-                              ),
-
-                              //텍스트필드 선택시 포커스 라인
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: Color(0xffCBCBCB), width: 2.0),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(5.0)),
-                              ),
-                            ),
-                            maxLines: 1,
-                            minLines: 1,
-                          ),
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: 20.h,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          margin: EdgeInsets.only(left: 15.w),
-                          child: Text("E-MAIL"),
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(right: 15.w),
-                          height: 50.h,
-                          width: 250.w,
-                          child: TextFormField(
-                            onSaved: (String? val) {},
-                            autovalidateMode: AutovalidateMode.always,
-                            validator: (String? val) {
-                              validateEmail(val);
-                              // if(val == null || val.isEmpty) {
-                              //   return "이메일을 입력해주세요";
-                              // }
-                              // return null;
-                            },
-                            scrollPadding: EdgeInsets.only(
-                                bottom:
-                                    MediaQuery.of(context).viewInsets.bottom),
-                            textInputAction: TextInputAction.next,
-                            textAlignVertical: TextAlignVertical.center,
-                            // controller: textController,
-                            // inputFormatters: [
-                            //   FilteringTextInputFormatter.allow(
-                            //       RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$'))
-                            // ],
-                            keyboardType: TextInputType.emailAddress,
-                            decoration: InputDecoration(
-                              hintText: " @ ",
-                              hintStyle: TextStyle(
-                                  fontSize: 15.w, color: Color(0xffA3A3A3)),
-                              contentPadding: EdgeInsets.only(left: 10.w),
-                              //테두리두께
-                              border: const OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(2.0)),
-                              ),
-
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: Color(0xffCBCBCB), width: 2.0),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(5.0)),
-                              ),
-
-                              //텍스트필드 선택시 포커스 라인
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: Color(0xffCBCBCB), width: 2.0),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(5.0)),
-                              ),
-                            ),
-                            maxLines: 1,
-                            minLines: 1,
-                          ),
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: 10.h,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          margin: EdgeInsets.only(left: 15.w),
-                          child: Text("성 별"),
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(right: 15.w),
-                          height: 150.h,
-                          width: 250.w,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              //오류의 원인은 마지막 onChanged의 value가 Object?의 형식인데 String형식인 _selectedValue에 넣은 것이다. 그러므로 다음의 두가지를 해결해주면 오류는 없어지게 된다.
-                              // value가 Object가 아닌 String으로 만들기
-                              // value가 null인지 아닌지 체크하기 (null safety)
-                              RadioListTile (
-                                  title: Text("남자"),
-                                  value: Gender.MAN,
-                                  groupValue: _gender,
-                                  onChanged: (value) {
-                                setState(() {
-                                  _gender = value as Gender;
-                                });
-                              }),
-                              RadioListTile (
-                                  title: Text("여자"),
-                                  value: Gender.WOMEN,
-                                  groupValue: _gender,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _gender = value as Gender;
-                                    });
-                                  }),
-
-                              Text(
-                                '아이디: $_id 비밀번호: $_pw',
-                              ), // 어플을 재시작해도 데이터가 보존되는지 확인하기 위한 Text창
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
-                  ],
+                  ),
                 ),
               ),
-            ),
-          ),
-          bottomNavigationBar: BottomAppBar(
-            child: Container(
-              height: 70.h,
-              color: Colors.blueAccent,
-              child: ElevatedButton(
-                child: Text(
-                  "회 원 가 입 하 기",
-                  style: TextStyle(
-                      fontSize: 20.w,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white),
+              bottomNavigationBar: BottomAppBar(
+                child: Container(
+                  height: 70.h,
+                  color: Colors.blueAccent,
+                  child: ElevatedButton(
+                    child: Text(
+                      "회 원 가 입 하 기",
+                      style: TextStyle(
+                          fontSize: 20.w,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.blueAccent,
+                    ),
+                    //회원가입 설정
+                    onPressed: () {
+                      _id = idController.text; // _id 에 입력받은 값 넣어줌
+                      _pw = pwController.text; // _pw 에 입력받은 값 넣어줌
+                      _prefs.setString('id', _id); // id를 키로 가지고 있는 값에 입력받은 _id를 넣어줌. = 캐시에 넣어줌
+                      _prefs.setString('pw', _pw); // pw를 키로 가지고 있는 값에 입력받은 _pw를 넣어줌. = 캐시에 넣어줌
+                      logger.d("id===== ${_id = idController.text}");
+                      logger.d("pw===== ${_pw = pwController.text}");
+                      showDialog(
+                          // 버튼을 눌렀음을 확인시키기 위한 창 띄우기
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                                content: Text(
+                              '가입이 완료됐습니다.',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 10,
+                              ),
+                            ));
+                          });
+                      startTimer();
+                    },
+                  ),
                 ),
-                style: ElevatedButton.styleFrom(
-                  primary: Colors.blueAccent,
-                ),
-                //회원가입 설정
-                onPressed: () {
-                  _id = idController.text; // _id 에 입력받은 값 넣어줌
-                  _pw = pwController.text; // _pw 에 입력받은 값 넣어줌
-                  _prefs.setString(
-                      'id', _id); // id를 키로 가지고 있는 값에 입력받은 _id를 넣어줌. = 캐시에 넣어줌
-
-                  _prefs.setString(
-                      'pw', _pw); // pw를 키로 가지고 있는 값에 입력받은 _pw를 넣어줌. = 캐시에 넣어줌
-                  logger.d("id===== ${_id = idController.text}");
-                  logger.d("pw===== ${_pw = pwController.text}");
-                  showDialog(
-                      // 버튼을 눌렀음을 확인시키기 위한 창 띄우기
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                            content: Text(
-                          '가입이 완료됐습니다.',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 10,
-                          ),
-                        ));
-                      });
-                },
               ),
             ),
           ),

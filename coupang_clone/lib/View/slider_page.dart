@@ -1,4 +1,3 @@
-
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:coupang_clone/View/banner_page.dart';
 import 'package:coupang_clone/View/dont_miss_page.dart';
@@ -9,7 +8,6 @@ import 'package:coupang_clone/View/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 
 
 class SliderPage extends StatefulWidget {
@@ -24,29 +22,98 @@ class _SliderPageState extends State<SliderPage> {
   final CarouselController _controller = CarouselController();
   int _current = 0;
 
+  // 상태위젯 상태변수로 선언
+  DateTime? currentBackPressTime;
+
+  //자동로그인 토글
+  bool _switchValue = false;
+
+  String loginId = '';
+  String loginPw = '';
+  String _id = '';
+  String _pw = '';
+
+  _clearData() async {
+    SharedPreferences _prefs = await SharedPreferences.getInstance();
+    setState(() {
+      loginId = _prefs.getString('id')!;
+      loginPw = _prefs.getString("pw")!;
+      // * id,pw 최신 값을 SharedPreferences에 저장
+      // _prefs.setString('id', _id);
+      // _prefs.setString('pw', _pw);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return NestedScrollView(
-        headerSliverBuilder: (BuildContext context, bool innerBoxScrolled) {
-          return <Widget>[
-            createLogo(),
-            onTextField(),
-            _mainSlider(),
-            _iconSlider(context),
-            _bannerImage(context),
-            _prodBannerText(context),
-            _specialProd(context),
-            _bottomLine(context),
-            _needBanner(context),
-            _needProd(context),
-            _bottomLine2(context),
-            _hotToyText(context),
-            _hotToy(context),
-            _bottomLine3(context),
-          ];
+    return GestureDetector(
+      onTap: () {
+        // inputbox 바깥 탭 시에  "키보드 닫힘"
+        //FocusNode = 선택된 위젯을 관리(거의 대부분 텍스트필드를 관리한다_선택됐을 때)
+        //new = 클래스명의 인스턴스(생성자)를 만든다.
+        //키보드가 닫히는 이유는, 새로운 포커스를 새로 잡기 때문에
+        FocusScope.of(context).requestFocus(new FocusNode());
+      },
+      //주변범위, 불투명 한 대상은 hit test에 의해 hit 될 수 있으므로 둘 다 해당 범위 내에서 이벤트를 수신하고 시각적으로 뒤에 있는 대상도 이벤트를 수신하지 못하도록 한다.
+      behavior: HitTestBehavior.opaque,
+      child: WillPopScope(
+        onWillPop: () async {
+          DateTime now = DateTime.now();
+          //상태변화가 없거나,새로 상태가 변경됐을 때, 5초간격보다 클 때, [스낵바 띄우기 + "시간 초기화" ]
+          if (currentBackPressTime == null ||
+              now.difference(currentBackPressTime!) > Duration(seconds: 5)) {
+            //시간초기화
+            currentBackPressTime = now;
+            //백키처리 스낵바
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Row(
+                  children: [
+                    Icon(
+                      Icons.notification_important,
+                      color: Colors.white,
+                    ),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        '뒤로가기 버튼을 한 번 더 누르시면 종료됩니다.',
+                        //컨텍스트의 주제
+                        style: Theme.of(context)
+                            .textTheme
+                            .subtitle1!
+                            .copyWith(color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+            return Future.value(false);
+          }
+          return Future.value(true);
         },
-        body: SizedBox.shrink()
+        child: NestedScrollView(
+            headerSliverBuilder: (BuildContext context, bool innerBoxScrolled) {
+              return <Widget>[
+                createLogo(),
+                onTextField(),
+                _mainSlider(),
+                _iconSlider(context),
+                _bannerImage(context),
+                _prodBannerText(context),
+                _specialProd(context),
+                _bottomLine(context),
+                _needBanner(context),
+                _needProd(context),
+                _bottomLine2(context),
+                _hotToyText(context),
+                _hotToy(context),
+                _bottomLine3(context),
+              ];
+            },
+            body: SizedBox.shrink()
+        ),
+      ),
     );
   }
 
@@ -180,24 +247,28 @@ class _SliderPageState extends State<SliderPage> {
                       //로그아웃
                       GestureDetector(
                         onTap: () async {
-                          SharedPreferences _prefs = await SharedPreferences.getInstance();
-                          bool isAuto = false;
-                          _prefs.setBool("false", isAuto);
-                          Navigator.of(context).pushReplacementNamed(Routes.login);
+                          //로그아웃 다이얼로그
+                          logoutDialog(context);
 
+                          bool isAuto = false;
+                          SharedPreferences _prefs = await SharedPreferences.getInstance();
+                          _prefs.setBool("AUTO_LOGIN", isAuto);
+                          setState(() {
+                            _clearData();
+                          });
+                          // Navigator.of(context).pushReplacementNamed(Routes.login);
                           // Navigator.push(context,
                           //     MaterialPageRoute(builder: (_) => LogInPage()));
                         },
                         child: Container(
                           // height: 32.h,
                           margin: EdgeInsets.only(right: 20.w),
-                          child: Icon(Icons.doorbell_outlined, color: Colors.grey, size: 30.w),
+                          child: Icon(Icons.logout, color: Colors.red, size: 30.w),
                           ),
                       ),
                     ],
                   ),
                 ),
-
               ),
             );
           }),
@@ -1089,4 +1160,85 @@ class _SliderPageState extends State<SliderPage> {
 
 
 
+}
+//로그아웃 다이얼로그
+void logoutDialog(BuildContext context) {
+  showDialog(
+      context: context,
+      //Dialog를 제외한 다른 화면 터치 x
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          //Dialog 화면 모서리 둥글게 조절
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.0)),
+          title: Column(
+            children: <Widget>[
+              Text(
+                "로그아웃 확인.",
+                style: TextStyle(
+                    fontSize: 20.w,
+                    color: Color(0xff333333)),
+              ),
+            ],
+          ),
+          //
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                "로그아웃 하시겠습니까?",
+                style: TextStyle(
+                    fontSize: 15.w,
+                    color: Color(0xff333333)),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            ElevatedButton(
+              child: Column(
+                children: [
+                  Text(
+                    "확 인",
+                    style: TextStyle(
+                        fontFamily: 'NMFont',
+                        fontSize: 15.w,
+                        color: Colors.white),
+                  ),
+                ],
+              ),
+              style: ElevatedButton.styleFrom(
+                primary: Colors.amberAccent,
+              ),
+              //다이얼로그종료
+              onPressed: () {
+                Navigator.of(context).pushReplacementNamed(Routes.login);
+                // Navigator.of(context).pop();
+                //Navigator.pop(context);
+              },
+            ),
+            ElevatedButton(
+              child: Column(
+                children: [
+                  Text(
+                    "취 소",
+                    style: TextStyle(
+                        fontFamily: 'NMFont',
+                        fontSize: 15.w,
+                        color: Colors.white),
+                  ),
+                ],
+              ),
+              style: ElevatedButton.styleFrom(
+                primary: Colors.amberAccent,
+              ),
+              //다이얼로그종료
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      });
 }
